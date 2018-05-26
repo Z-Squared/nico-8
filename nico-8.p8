@@ -40,14 +40,32 @@ function _update()
 	if nico.vx > 5 then nico.vx = 5 end
  if nico.vx < -5 then nico.vx = -5 end
 
- nico.x = nico.x + nico.vx
- nico.y = nico.y + nico.vy
- 
- if nico.y > 60 then
-  nico.vy = 0
-  nico.y = 60
+ if not on_ground() then
+  nico.vy = nico.vy + 1
  end
 
+ fx = nico.x + nico.vx
+ fy = nico.y + nico.vy
+
+ afy = (nico.y + fy) / 2
+
+ if is_blocking(fx, afy) or is_blocking(fx, fy) then
+  for i = nico.y,fy do
+    if is_blocking(nico.x, i) then
+     nico.y = i
+     break
+    end
+  end
+
+  nico.vy = 0
+ end
+
+ if nico.vy > 10 then
+  nico.vy = 10
+ end
+
+ nico.x = nico.x + nico.vx
+ nico.y = nico.y + nico.vy
 end
 
 function handle_input()
@@ -58,7 +76,7 @@ function handle_input()
  	if nico.vx == 0 then
  		if stat(16) != 1 then
  		 sfx(1, 0)
- 		end	
+ 		end
  	else
  		brake()
  	end
@@ -69,7 +87,8 @@ function handle_input()
 	-- jump
 	if nico.jumping and not (btn(4)) and on_ground() then
 	 nico.jumping = false
-	end 
+	end
+
  if not nico.jumping and (btn(4)) and on_ground() then
   nico.vy = -8
   nico.jumping = true
@@ -77,11 +96,11 @@ function handle_input()
  end
  
  -- jump acceleration
-	if nico.y < 60 then
+	if is_blocking(nico.x, nico.y - 1) then
 	 if btn(4) then
-	  nico.vy = nico.vy + 1
+	  nico.vy = nico.vy
 	 else
-	  nico.vy = nico.vy + 2
+	  nico.vy = nico.vy + 1
 	 end
 	end
  
@@ -91,13 +110,13 @@ function handle_input()
  end
  
  -- directions
- if (btn(0)) then 
+ if (btn(0)) then
  	nico.vx=nico.vx-2
  	nico.l=true
  	nico.s=2+t/4%2
  end
-	if (btn(1)) then 
-		nico.vx=nico.vx+2 
+	if (btn(1)) then
+		nico.vx=nico.vx+2
 		nico.l=false
 		nico.s=2+t/4%2
 	end
@@ -109,8 +128,13 @@ function brake()
  if nico.vx < 0 then nico.vx = nico.vx + 1 end
 end
 
+function is_blocking(x, y)
+ return fget(mget(x / 8, y / 8 + 1), 0)
+end
+
 function on_ground()
-	return nico.y == 60
+	return is_blocking(nico.x + 1, nico.y)
+	 or is_blocking(nico.x + 7, nico.y)
 end
 -->8
 -- draw + related
