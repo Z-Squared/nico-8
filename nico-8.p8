@@ -9,25 +9,25 @@ nico nico nii♥
 --]]
 
 function _init()
-	t=0
-	palt(0,false)
-	
-	nico = { -- nico-nii
-	 x = 0,
-	 y = 60,
-	 vx = 0,
-	 vy = 0,
-	 s = 1,
-	 l = false -- left?
-	}
+ t=0
+ palt(0,false)
+
+ nico = { -- nico-nii
+  x = 0,
+  y = 60,
+  vx = 0,
+  vy = 0,
+  s = 1,
+  l = false -- left?
+ }
 end
 
 -->8
 -- update + related
 
 function _update()
-	t=t+1
-	if t == 32766 then	t = 0	end -- lolololololol
+ t=t+1
+ if t == 32766 then t = 0 end -- lolololololol
 
  if stat(16) != 1 then
   handle_input()
@@ -37,7 +37,7 @@ function _update()
 
  brake()
 
-	if nico.vx > 5 then nico.vx = 5 end
+ if nico.vx > 5 then nico.vx = 5 end
  if nico.vx < -5 then nico.vx = -5 end
 
  if not on_ground() then
@@ -51,10 +51,10 @@ function _update()
 
  if is_blocking(fx, afy) or is_blocking(fx, fy) then
   for i = nico.y,fy do
-    if is_blocking(nico.x, i) then
-     nico.y = i
-     break
-    end
+   if is_blocking(nico.x, i) then
+    nico.y = i
+    break
+   end
   end
 
   nico.vy = 0
@@ -71,60 +71,59 @@ end
 function handle_input()
  nico.s = 1
 
-	-- nico nico nii♥
+ -- nico nico nii♥
  if (btn(2)) and on_ground() then
- 	if nico.vx == 0 then
- 		if stat(16) != 1 then
- 		 sfx(1, 0)
- 		end
- 	else
- 		brake()
- 	end
- 	
- 	return
+  if nico.vx == 0 then
+   if stat(16) != 1 then
+    sfx(1, 0)
+   end
+  else
+   brake()
+  end
+
+  return
  end
- 
-	-- jump
-	if nico.jumping and not (btn(4)) and on_ground() then
-	 nico.jumping = false
-	end
+
+ -- jump
+ if nico.jumping and not (btn(4)) and on_ground() then
+  nico.jumping = false
+ end
 
  if not nico.jumping and (btn(4)) and on_ground() then
   nico.vy = -8
   nico.jumping = true
   sfx(0)
  end
- 
+
  -- jump acceleration
-	if is_blocking(nico.x, nico.y - 1) then
-	 if btn(4) then
-	  nico.vy = nico.vy
-	 else
-	  nico.vy = nico.vy + 1
-	 end
-	end
- 
+ if is_blocking(nico.x, nico.y - 1) then
+  if btn(4) then
+   nico.vy = nico.vy
+  else
+   nico.vy = nico.vy + 1
+  end
+ end
+
  -- both directions means no movement
  if (btn(0) and btn(1)) then
- 	return
+  return
  end
- 
+
  -- directions
  if (btn(0)) then
- 	nico.vx=nico.vx-2
- 	nico.l=true
- 	nico.s=2+t/4%2
+  nico.vx=nico.vx-2
+  nico.l=true
+  nico.s=2+t/4%2
  end
-	if (btn(1)) then
-		nico.vx=nico.vx+2
-		nico.l=false
-		nico.s=2+t/4%2
-	end
-	
+ if (btn(1)) then
+  nico.vx=nico.vx+2
+  nico.l=false
+  nico.s=2+t/4%2
+ end
 end
 
 function brake()
-	if nico.vx > 0 then nico.vx = nico.vx - 1 end
+ if nico.vx > 0 then nico.vx = nico.vx - 1 end
  if nico.vx < 0 then nico.vx = nico.vx + 1 end
 end
 
@@ -133,38 +132,40 @@ function is_blocking(x, y)
 end
 
 function on_ground()
-	return is_blocking(nico.x + 1, nico.y)
-	 or is_blocking(nico.x + 7, nico.y)
+ return is_blocking(nico.x + 1, nico.y)
+  or is_blocking(nico.x + 7, nico.y)
 end
 -->8
 -- draw + related
 
 function _draw()
-	cls()
-	
-	print(stat(16) ,0,0,7)
-	
-	local left = nico.l
-	
-	rectfill(10,10,118,118,13)
-  
-	palt(11,false)
+ cls()
+
+ if nico.vy >= 10 then
+  print("waahhhhh!!",0,0,7)
+ end
+
+ local left = nico.l
+
+ rectfill(10,10,118,118,13)
+
+ palt(11,false)
  map(0,0, 0,0, 20,20)
-	palt(11,true)
+ palt(11,true)
 
  if nico.s == 4 then
- 	nico.l = false
+  nico.l = false
   if t%16 > 8 then
    print("nico nico nii♥",nico.x-20,nico.y-8,14)
   end
- end 
+ end
 
  if nico.jumping and not on_ground() then
- 	if nico.vy > 0 then
- 	 nico.s = 6
- 	else
- 	 nico.s = 5
- 	end
+  if nico.vy > 0 then
+   nico.s = 6
+  else
+   nico.s = 5
+  end
  end
 
  drawsprite(nico)
@@ -172,7 +173,7 @@ function _draw()
 end
 
 function drawsprite(s) -- this is cool
-	spr(s.s, s.x, s.y, 1, 1, s.l)
+ spr(s.s, s.x, s.y, 1, 1, s.l)
 end
 
 __gfx__
@@ -223,4 +224,3 @@ __sfx__
 00100000030000100003000030000a0000a0000800001000010000a000000000a0000a0000a000010000300003000080000a0000a0000a000080000800001000030000a00008000030000a000000000000000000
 __music__
 00 02424344
-
