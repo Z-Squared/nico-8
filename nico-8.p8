@@ -95,12 +95,8 @@ function handle_input()
  end
 
  -- jump acceleration
- if is_blocking(nico.x, nico.y - 1) then
-  if btn(4) then
-   nico.vy = nico.vy
-  else
-   nico.vy = nico.vy + 1
-  end
+ if not btn(4) then
+  nico.vy = nico.vy + 1
  end
 
  -- both directions means no movement
