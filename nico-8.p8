@@ -59,8 +59,8 @@ function _update()
   nico.vy = 0
  end
 
- if nico.vy > 10 then
-  nico.vy = 10
+ if nico.vy > 15 then
+  nico.vy = 15
  end
 
  nico.x = nico.x + nico.vx
@@ -136,7 +136,7 @@ end
 function _draw()
  cls()
 
- if nico.vy >= 10 then
+ if nico.vy >= 15 then
   print("waahhhhh!!",0,0,7)
  end
 
