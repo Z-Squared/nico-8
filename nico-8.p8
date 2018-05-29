@@ -118,9 +118,8 @@ function handle_input()
   nico.vx=nico.vx+2
   nico.l=false
   nico.s=2+t/4%2
-  cam_x = nico.x - 60
  end
- 
+
  if nico.x < 60 then
   cam_x = 0
  elseif nico.x > 163 then
@@ -128,7 +127,7 @@ function handle_input()
  else
   cam_x = nico.x-60
  end
- 
+
 end
 
 function brake()
