@@ -120,14 +120,6 @@ function handle_input()
   nico.s=2+t/4%2
  end
 
- if nico.x < 60 then
-  cam_x = 0
- elseif nico.x > 163 then
-  cam_x = 104
- else
-  cam_x = nico.x-60
- end
-
 end
 
 function brake()
@@ -149,6 +141,14 @@ end
 function _draw()
  cls()
  
+ if nico.x < 60 then
+  cam_x = 0
+ elseif nico.x > 263 then
+  cam_x = 204
+ else
+  cam_x = nico.x-60
+ end
+
  camera(cam_x, cam_y)
  
  -- debug some value here
@@ -156,9 +156,7 @@ function _draw()
 --  print("waahhhhh!!",0+cam_x,0,7)
 -- end
 
-  print("camx="..cam_x..", nico.x="..nico.x,0+cam_x,0,7)
-
-
+ print("camx="..cam_x..", nico.x="..nico.x,0+cam_x,0,7)
 
  local left = nico.l
 
