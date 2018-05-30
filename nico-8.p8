@@ -21,13 +21,25 @@ function _init()
   s = 1,
   l = false -- left?
  }
+
+ dbg = ""
 end
 
+-- call me with all of your debug messages!
+function debug(msg)
+ if dbg != "" then
+  dbg = dbg.."\n"
+ end
+
+ dbg = dbg..tostr(msg)
+end
 -->8
 -- update + related
 
 function _update()
  t=t+1
+ dbg = ""
+
  if t == 32766 then t = 0 end -- lolololololol
 
  if stat(16) != 1 then
@@ -156,7 +168,7 @@ function _draw()
 --  print("waahhhhh!!",0+cam_x,0,7)
 -- end
 
- print("camx="..cam_x..", nico.x="..nico.x,0+cam_x,0,7)
+ debug("camx="..cam_x..", nico.x="..nico.x)
 
  local left = nico.l
 
@@ -184,6 +196,8 @@ function _draw()
  end
 
  drawsprite(nico)
+
+ print(dbg,cam_x,cam_y,7)
  nico.l = left
 end
 
