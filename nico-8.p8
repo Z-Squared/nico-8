@@ -11,7 +11,7 @@ nico nico nii♥
 function _init()
  t=0
 
- cam_x, cam_y = 0
+ cam_x, cam_y = 0, 0
 
  nico = { -- nico-nii
   x = 0,
@@ -168,7 +168,9 @@ function _draw()
 --  print("waahhhhh!!",0+cam_x,0,7)
 -- end
 
- debug("camx="..cam_x..", nico.x="..nico.x)
+ debug("nico.x="..nico.x..", nico.y="..nico.y)
+ debug("cam_x="..cam_x..", cam_y="..cam_y)
+ debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8))
 
  local left = nico.l
 
