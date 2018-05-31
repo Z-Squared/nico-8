@@ -62,9 +62,9 @@ function _update()
 
  afy = (nico.y + fy) / 2
 
- if is_blocking(fx, afy) or is_blocking(fx, fy) then
+ if is_ground(fx, afy) or is_ground(fx, fy) then
   for i = nico.y,fy do
-   if is_blocking(nico.x, i) then
+   if is_ground(nico.x, i) then
     nico.y = i
     break
    end
@@ -109,7 +109,7 @@ function handle_input()
  end
 
  -- jump acceleration
- if is_blocking(nico.x, nico.y - 1) then
+ if is_ground(nico.x, nico.y - 1) then
   if not btn(4) then
    nico.vy = nico.vy + 1
   end
@@ -144,8 +144,12 @@ function is_blocking(x, y)
 end
 
 function on_ground()
- return is_blocking(nico.x + 1, nico.y)
-  or is_blocking(nico.x + 7, nico.y)
+ return is_ground(nico.x, nico.y)
+end
+
+function is_ground(x, y)
+ return is_blocking(x + 1, y)
+  or is_blocking(x + 7, y)
 end
 -->8
 -- draw + related
