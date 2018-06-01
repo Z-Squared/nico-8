@@ -91,6 +91,8 @@ function _update()
 
  nico.x = nico.x + nico.vx
  nico.y = nico.y + nico.vy
+
+ if nico.x < 0 then nico.x = 0 end
 end
 
 function handle_input()
@@ -198,7 +200,7 @@ function _draw()
 
  local left = nico.l
 
- rectfill(10,10,248,118,13)
+ rectfill(0,10,248,118,13)
 
  palt(0,true)
  palt(11,false)
