@@ -61,6 +61,7 @@ function _update()
  fy = nico.y + nico.vy
 
  afy = (nico.y + fy) / 2
+ afx = (nico.x + fx) / 2
 
  if is_ground(fx, afy) or is_ground(fx, fy) then
   for i = nico.y,fy do
@@ -71,6 +72,17 @@ function _update()
   end
 
   nico.vy = 0
+ end
+
+ if solid(afx, fy) or solid(fx, fy) then
+  for i = nico.x,fx do
+   if solid(i, nico.y) then
+    nico.x = i
+    break
+   end
+  end
+
+  nico.vx = 0
  end
 
  if nico.vy > 15 then
@@ -122,14 +134,18 @@ function handle_input()
 
  -- directions
  if (btn(0)) then
-  nico.vx=nico.vx-2
-  nico.l=true
-  nico.s=2+t/4%2
+  if solid(nico.x - 1, nico.y) == false then
+   nico.vx=nico.vx-2
+   nico.l=true
+   nico.s=2+t/4%2
+  end
  end
  if (btn(1)) then
-  nico.vx=nico.vx+2
-  nico.l=false
-  nico.s=2+t/4%2
+  if solid(nico.x + 7, nico.y) == false then
+   nico.vx=nico.vx+2
+   nico.l=false
+   nico.s=2+t/4%2
+  end
  end
 
 end
@@ -137,6 +153,10 @@ end
 function brake()
  if nico.vx > 0 then nico.vx = nico.vx - 1 end
  if nico.vx < 0 then nico.vx = nico.vx + 1 end
+end
+
+function solid(x, y)
+ return fget(mget(flr(x / 8), flr(y / 8)), 0)
 end
 
 function is_blocking(x, y)
@@ -174,7 +194,7 @@ function _draw()
 
  debug("nico.x="..nico.x..", nico.y="..nico.y)
  debug("cam_x="..cam_x..", cam_y="..cam_y)
- debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8))
+ debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8)..", solid: "..tostr(solid(nico.x,nico.y)))
 
  local left = nico.l
 
