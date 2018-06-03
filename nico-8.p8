@@ -1,10 +1,10 @@
 pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
---[[ init
-nico-8
-by nodocchi
+-- nico-8
+-- by nodocchi
 
+--[[
 nico nico nii♥
 --]]
 
@@ -13,11 +13,12 @@ function _init()
 
  cam_x, cam_y = 0, 0
 
+-- scans map for nico's sprite
  for y=0,63 do
   for x=0,127 do
    if (mget(x,y) == 1) then
     nico = make_nico(x,y)
-    mset(x,y,0) 
+    mset(x,y,0)
    end
   end
  end
@@ -25,15 +26,16 @@ function _init()
  dbg = ""
 end
 
+-- creates nico based on x and y which should be found using mget
 function make_nico(x,y)
  local n = {} -- nico-nii
-  n.x = x*8
-  n.y = y*8
+  n.x = x * 8 -- convert tile value to pixel value
+  n.y = y * 8 -- convert tile value to pixel value
   n.vx = 0
   n.vy = 0
   n.s = 1
   n.l = false -- left?
- 
+
  return n
 end
 
@@ -54,6 +56,7 @@ function _update()
 
  if t == 32766 then t = 0 end -- lolololololol
 
+ -- if nico nico nii♥ is playing, prevent other input
  if stat(16) != 1 then
   handle_input()
  else
@@ -107,6 +110,7 @@ function _update()
  if nico.x < 0 then nico.x = 0 end
 end
 
+-- all button press stuff should be handled here
 function handle_input()
  nico.s = 1
 
@@ -164,12 +168,17 @@ function handle_input()
 
 end
 
+-- slow down nico
 function brake()
  if nico.vx > 0 then nico.vx = nico.vx - 1 end
  if nico.vx < 0 then nico.vx = nico.vx + 1 end
 end
 
+-- check for solid blocks
 function solid(x, y)
+ if (x < 0 or x >= 1024 ) then
+  return true end
+
  return fget(mget(flr(x / 8), flr(y / 8)), 0)
 end
 
@@ -177,6 +186,7 @@ function is_blocking(x, y)
  return fget(mget(x / 8, y / 8 + 1), 0)
 end
 
+-- is nico on the ground?
 function on_ground()
  return is_ground(nico.x, nico.y)
 end
@@ -200,12 +210,13 @@ function _draw()
  end
 
  camera(cam_x, cam_y)
- 
+
 -- debug some value here
 -- if nico.vy >= 15 then
 --  print("waahhhhh!!",0+cam_x,0,7)
 -- end
 
+ -- cooridinate debugging, includes x and y values for nico, camera, and map tiles
  debug("nico.x="..nico.x..", nico.y="..nico.y)
  debug("cam_x="..cam_x..", cam_y="..cam_y)
  debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8)..", solid: "..tostr(solid(nico.x,nico.y)))
@@ -218,7 +229,7 @@ function _draw()
  palt(11,false)
  map(0,0, 0,0, 120,20)
  palt(11,true)
-	palt(0,false)
+ palt(0,false)
 
  if nico.s == 4 then
   nico.l = false
