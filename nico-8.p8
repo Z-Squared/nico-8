@@ -123,17 +123,20 @@ function make_nico(x,y)
 end
 
 -- creates an array of the levels
-function create_level_array(level_offset)
- local level = {}
-
- for x=0,127 do
-  level[x+1] = {}
-   for y=0,15 do
-    level[x+1][y+1] = mget(x,y+(16*level_offset))
+function create_level_array()
+ local levels = {}
+ 
+ for l=0,3 do
+  levels[l+1] = {}
+  for x=0,127 do
+   levels[l+1][x+1] = {}
+    for y=0,15 do
+     levels[l+1][x+1][y+1] = mget(x,y+(16*l))
+   end
   end
  end
 
- return level
+ return levels
 end
 
 -- sets the play area for level 1 to levels stored in array
@@ -387,9 +390,9 @@ function draw_level_background()
  elseif currentlevel == 1 then
   rectfill(0,0,248,118,12)
  elseif currentlevel == 2 then
-  rectfill(0,0,248,118,11)
+  rectfill(0,0,248,118,3)
  elseif currentlevel == 3 then
-  rectfill(0,0,248,118,10)
+  rectfill(0,0,248,118,6)
  end
 end
 
