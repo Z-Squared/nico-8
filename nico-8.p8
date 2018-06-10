@@ -57,6 +57,8 @@ function game_init()
    end
   end
  end
+
+ game_cam = make_cam(nico)
 end
 
 function titlescreen()
@@ -170,6 +172,7 @@ end
 function game_update()
  t=t+1
  dbg = ""
+ game_cam:update()
 
  if t == 32766 then t = 0 end -- lolololololol
 
@@ -225,27 +228,42 @@ function game_update()
  nico.y = nico.y + nico.vy
 end
 
-function cam(target,return_val)
- local cam_y = 0
- local cam_x = target.x-64
+function make_cam(target)
+ local cam = 
+ {
+  tar = target,
 
- local min_x = 0
- local max_x = 128*8
+  cam_y = 0,
+  cam_x = 0,
 
+  min_x = 0,
+  max_x = 128*8,
 
- if target.x < min_x+64 then
-  cam_x = min_x
- elseif target.x > max_x-65 then
-  cam_x = max_x-128
- end
+  update=function(self)
+   self.cam_x = self.tar.x - 60
+  
+   if(self.cam_x < self.min_x) then
+    self.cam_x = self.min_x
+   end
+   if(self.cam_x + 128 > self.max_x) then
+    self.cam_x = self.max_x - 128
+   end
+  end,
 
- if return_val == "x" then
-  return cam_x
- elseif return_val == "y" then
-  return cam_y
- end
+  value=function(self)
+   return self.cam_x, self.cam_y
+  end,
 
- return cam_x, cam_y
+  return_x=function(self)
+   return self.cam_x
+  end,
+
+  return_y=function(self)
+   return self.cam_y
+  end
+ }
+
+ return cam
 end
 
 -- all button press stuff should be handled here
@@ -345,7 +363,7 @@ end
 function game_draw()
  cls()
 
- camera(cam(nico))
+ camera(game_cam:value())
 
 -- debug some value here
 -- if nico.vy >= 15 then
@@ -354,7 +372,7 @@ function game_draw()
 
  -- cooridinate debugging, includes x and y values for nico, camera, and map tiles
  debug("nico.x="..nico.x..", nico.y="..nico.y)
- debug("cam_x="..cam(nico,"x")..", cam_y="..cam(nico,"y"))
+ debug("cam_x="..game_cam:return_x()..", cam_y="..game_cam:return_y())
  debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8)..", solid: "..tostr(is_wall(nico.x,nico.y)))
 
  local left = nico.l
@@ -397,7 +415,7 @@ end
 
 function draw_level_background()
  if currentlevel == 0 then
-  rectfill(0,0,248,118,13)
+  rectfill(0,0,2480,118,13)
  elseif currentlevel == 1 then
   rectfill(0,0,248,118,12)
  elseif currentlevel == 2 then
