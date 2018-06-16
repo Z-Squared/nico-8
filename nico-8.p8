@@ -209,9 +209,9 @@ function game_update()
   nico.vy = 0
  end
 
- if solid(afx, fy) or solid(fx, fy) then
+ if is_wall(afx, fy) or is_wall(fx, fy) then
   for i = nico.x,fx do
-   if solid(i, nico.y) then
+   if is_wall(i, nico.y) then
     nico.x = i
     break
    end
@@ -308,14 +308,14 @@ function handle_input()
 
  -- directions
  if (btn(0)) then
-  if solid(nico.x - 1, nico.y) == false then
+  if is_wall(nico.x - 1, nico.y) == false then
    nico.vx=nico.vx-2
    nico.l=true
    nico.s=2+t/4%2
   end
  end
  if (btn(1)) then
-  if solid(nico.x + 7, nico.y) == false then
+  if is_wall(nico.x + 7, nico.y) == false then
    nico.vx=nico.vx+2
    nico.l=false
    nico.s=2+t/4%2
@@ -330,8 +330,8 @@ function brake()
  if nico.vx < 0 then nico.vx = nico.vx + 1 end
 end
 
--- check for solid blocks
-function solid(x, y)
+-- check for wall
+function is_wall(x, y)
  if (x < 0 or x >= 1024 ) then
   return true end
 
