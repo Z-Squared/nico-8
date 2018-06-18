@@ -9,6 +9,7 @@ nico nico nii♥
 --]]
 
 export_levels = false
+camera_drag = true
 
 function _init()
 -- creates array from map
@@ -72,33 +73,43 @@ function titlescreen()
  print("level 2", 30, 38, 13)
  print("level 3", 30, 46, 13)
  print("level 4", 30, 54, 13)
+ print("camera drag: "..tostr(camera_drag), 30, 62, 13)
 
  menu_input()
 end
 
 function menu_input()
- 
+
  if (btn(2) and btn(3)) then
   return
  end
 
  if btnp(2) then
   if arrow.y == 30 then
-   arrow.y = 54
+   arrow.y = 62
   else
    arrow.y -= 8
   end
  end
 
  if btnp(3) then
-  if arrow.y == 54 then
+  if arrow.y == 62 then
    arrow.y = 30
   else
    arrow.y += 8
   end
  end
 
- if btn(4) then
+ if btnp(4) then
+  if arrow.y == 62 then
+   if camera_drag == true then
+    camera_drag = false
+   else
+    camera_drag = true
+   end
+    return
+  end
+
   if arrow.y == 30 then currentlevel = 0 end
   if arrow.y == 38 then currentlevel = 1 end
   if arrow.y == 46 then currentlevel = 2 end
@@ -172,7 +183,6 @@ end
 function game_update()
  t=t+1
  dbg = ""
- game_cam:update()
 
  if t == 32766 then t = 0 end -- lolololololol
 
@@ -219,6 +229,7 @@ function game_update()
 
   nico.vx = 0
  end
+ if camera_drag == true then game_cam:update() end
 
  if nico.vy > 15 then
   nico.vy = 15
@@ -226,10 +237,11 @@ function game_update()
 
  nico.x = nico.x + nico.vx
  nico.y = nico.y + nico.vy
+ if camera_drag == false then game_cam:update() end
 end
 
 function make_cam(target)
- local cam = 
+ local cam =
  {
   tar = target,
 
