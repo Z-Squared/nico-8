@@ -147,14 +147,8 @@ function make_nico(x,y)
    if this.vx < 0 then this.vx = this.vx + 1 end
   end,
 
-  update=function(this)
+  handle_input=function(this)
    this.s = 1
-
-    -- if nico nico nii♥ is playing, prevent other input
-    if stat(16) == 1 then
-     this.s = 4
-     return
-    end
 
    -- nico nico nii♥
    if (btn(2)) and on_ground() then
@@ -207,6 +201,16 @@ function make_nico(x,y)
      this.s=2+t/4%2
     end
    end
+  end,
+
+  update=function(this)
+
+   -- if nico nico nii♥ is playing, prevent other input
+   if stat(16) != 1 then
+    this.handle_input(this)
+   else
+    this.s = 4
+   end 
 
    this.brake(this)
 
@@ -352,11 +356,6 @@ function make_cam(target)
 
  return cam
 end
-
--- all button press stuff should be handled here
--- function handle_input()
---
--- end
 
 -- check for wall
 function is_wall(x, y)
