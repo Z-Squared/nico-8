@@ -124,13 +124,135 @@ end
 
 -- creates nico based on x and y which should be found using mget
 function make_nico(x,y)
- local n = {} -- nico-nii
-  n.x = x * 8 -- convert tile value to pixel value
-  n.y = y * 8 -- convert tile value to pixel value
-  n.vx = 0
-  n.vy = 0
-  n.s = 1
-  n.l = false -- left?
+ local n = { -- nico-nii
+  x = x * 8, -- convert tile value to pixel value
+  y = y * 8, -- convert tile value to pixel value
+  vx = 0,
+  vy = 0,
+  s = 1,
+  l = false, -- left?
+
+  reset=function(this)
+   this.x = 0
+   this.y = 0
+   this.vx = 0
+   this.vy = 0
+   this.s = 1
+   this.l = false
+  end,
+
+  -- slow down nico
+  brake=function(this)
+   if this.vx > 0 then this.vx = this.vx - 1 end
+   if this.vx < 0 then this.vx = this.vx + 1 end
+  end,
+
+  update=function(this)
+   this.s = 1
+
+    -- if nico nico nii♥ is playing, prevent other input
+    if stat(16) == 1 then
+     this.s = 4
+     return
+    end
+
+   -- nico nico nii♥
+   if (btn(2)) and on_ground() then
+    if this.vx == 0 then
+     if stat(16) != 1 then
+      sfx(1, 0)
+     end
+    else
+     this.brake(this)
+    end
+
+    return
+   end
+
+   -- jump
+   if this.jumping and not (btn(4)) and on_ground() then
+    this.jumping = false
+   end
+
+   if not this.jumping and (btn(4)) and on_ground() then
+    this.vy = -8
+    this.jumping = true
+    sfx(0)
+   end
+
+   -- jump acceleration
+   if is_ground(nico.x, nico.y - 1) then
+    if not btn(4) then
+     this.vy = this.vy + 1
+    end
+   end
+
+   -- both directions means no movement
+   if (btn(0) and btn(1)) then
+    return
+   end
+
+   -- directions
+   if (btn(0)) then
+    if is_wall(this.x - 1, this.y) == false then
+     this.vx=this.vx-2
+     this.l=true
+     this.s=2+t/4%2
+    end
+   end
+   if (btn(1)) then
+    if is_wall(this.x + 7, this.y) == false then
+     this.vx=this.vx+2
+     this.l=false
+     this.s=2+t/4%2
+    end
+   end
+
+   this.brake(this)
+
+   if this.vx > 5 then this.vx = 5 end
+   if this.vx < -5 then this.vx = -5 end
+
+   if not on_ground() then
+    this.vy = this.vy + 1
+   end
+
+   fx = this.x + this.vx
+   fy = this.y + this.vy
+
+   afy = (this.y + fy) / 2
+   afx = (this.x + fx) / 2
+
+   if is_ground(fx, afy) or is_ground(fx, fy) then
+    for i = this.y,fy do
+     if is_ground(this.x, i) then
+      this.y = i
+      break
+     end
+    end
+
+    this.vy = 0
+   end
+
+   if is_wall(afx, fy) or is_wall(fx, fy) then
+    for i = this.x,fx do
+     if is_wall(i, this.y) then
+      this.x = i
+      break
+     end
+    end
+
+    this.vx = 0
+   end
+
+   if this.vy > 15 then
+    this.vy = 15
+   end
+
+   this.x = this.x + this.vx
+   this.y = this.y + this.vy
+  end
+ }
 
  return n
 end
@@ -186,57 +308,10 @@ function game_update()
 
  if t == 32766 then t = 0 end -- lolololololol
 
- -- if nico nico nii♥ is playing, prevent other input
- if stat(16) != 1 then
-  handle_input()
- else
-  nico.s = 4
- end
-
- brake()
-
- if nico.vx > 5 then nico.vx = 5 end
- if nico.vx < -5 then nico.vx = -5 end
-
- if not on_ground() then
-  nico.vy = nico.vy + 1
- end
-
- fx = nico.x + nico.vx
- fy = nico.y + nico.vy
-
- afy = (nico.y + fy) / 2
- afx = (nico.x + fx) / 2
-
- if is_ground(fx, afy) or is_ground(fx, fy) then
-  for i = nico.y,fy do
-   if is_ground(nico.x, i) then
-    nico.y = i
-    break
-   end
-  end
-
-  nico.vy = 0
- end
-
- if is_wall(afx, fy) or is_wall(fx, fy) then
-  for i = nico.x,fx do
-   if is_wall(i, nico.y) then
-    nico.x = i
-    break
-   end
-  end
-
-  nico.vx = 0
- end
  if camera_drag == true then game_cam:update() end
 
- if nico.vy > 15 then
-  nico.vy = 15
- end
+ nico:update()
 
- nico.x = nico.x + nico.vx
- nico.y = nico.y + nico.vy
  if camera_drag == false then game_cam:update() end
 end
 
@@ -279,68 +354,9 @@ function make_cam(target)
 end
 
 -- all button press stuff should be handled here
-function handle_input()
- nico.s = 1
-
- -- nico nico nii♥
- if (btn(2)) and on_ground() then
-  if nico.vx == 0 then
-   if stat(16) != 1 then
-    sfx(1, 0)
-   end
-  else
-   brake()
-  end
-
-  return
- end
-
- -- jump
- if nico.jumping and not (btn(4)) and on_ground() then
-  nico.jumping = false
- end
-
- if not nico.jumping and (btn(4)) and on_ground() then
-  nico.vy = -8
-  nico.jumping = true
-  sfx(0)
- end
-
- -- jump acceleration
- if is_ground(nico.x, nico.y - 1) then
-  if not btn(4) then
-   nico.vy = nico.vy + 1
-  end
- end
-
- -- both directions means no movement
- if (btn(0) and btn(1)) then
-  return
- end
-
- -- directions
- if (btn(0)) then
-  if is_wall(nico.x - 1, nico.y) == false then
-   nico.vx=nico.vx-2
-   nico.l=true
-   nico.s=2+t/4%2
-  end
- end
- if (btn(1)) then
-  if is_wall(nico.x + 7, nico.y) == false then
-   nico.vx=nico.vx+2
-   nico.l=false
-   nico.s=2+t/4%2
-  end
- end
-
-end
-
--- slow down nico
-function brake()
- if nico.vx > 0 then nico.vx = nico.vx - 1 end
- if nico.vx < 0 then nico.vx = nico.vx + 1 end
-end
+-- function handle_input()
+--
+-- end
 
 -- check for wall
 function is_wall(x, y)
