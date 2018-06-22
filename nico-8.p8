@@ -9,7 +9,6 @@ nico nico nii♥
 --]]
 
 -- globals
-export_levels = false
 camera_drag = true
 
 objects = {}
