@@ -11,21 +11,30 @@ nico nico nii♥
 export_levels = false
 camera_drag = true
 
+-- menu arrow
+arrow = {
+  x = 20,
+  y = 30
+}
+
 function _init()
 -- creates array from map
  levels = create_level_array()
 
- arrow = {
-  x = 20,
-  y = 30
- }
+--[[ clear whole map
+for x=0,127 do
+ for y=0,63 do
+  mset(x,y,0)
+ end
+end
+--]]
 
  if export_levels == true then
   printh("level 1", "level1.txt", true)
   printh("level 2", "level2.txt", true)
   printh("level 3", "level3.txt", true)
   printh("level 4", "level4.txt", true)
-  
+
   for l=1,4 do
    for x=1,128 do
     for y=1,16 do
@@ -264,7 +273,7 @@ end
 -- creates an array of the levels
 function create_level_array()
  local levels = {}
- 
+
  for l=0,3 do
   levels[l+1] = {}
   for x=0,127 do
@@ -332,7 +341,7 @@ function make_cam(target)
 
   update=function(self)
    self.cam_x = self.tar.x - 60
-  
+
    if(self.cam_x < self.min_x) then
     self.cam_x = self.min_x
    end
