@@ -315,19 +315,19 @@ function make_nico(x,y)
    this.y = this.y + this.vy
   end,
 
-  pre_draw=function()
-   if nico.s == 4 then
-    nico.l = false
+  pre_draw=function(this)
+   if this.s == 4 then
+    this.l = false
     if t%16 > 8 then
-     print("nico nico nii♥",nico.x-20,nico.y-8,14)
+     print("nico nico nii♥",this.x-20,this.y-8,14)
     end
    end
 
-   if nico.jumping and not on_ground() then
-    if nico.vy > 0 then
-     nico.s = 6
+   if this.jumping and not on_ground() then
+    if this.vy > 0 then
+     this.s = 6
     else
-     nico.s = 5
+     this.s = 5
     end
    end
 
@@ -399,13 +399,13 @@ function game_draw()
  -- sprite drawing and dispatching
  foreach(objects, function(s)
   if s.pre_draw then
-   s.pre_draw()
+   s:pre_draw()
   end
 
   spr(s.s, s.x, s.y, 1, 1, s.l)
 
   if s.post_draw then
-   s.post_draw()
+   s:post_draw()
   end
  end)
 
