@@ -8,83 +8,24 @@ __lua__
 nico nico nii♥
 --]]
 
+-- globals
 export_levels = false
 camera_drag = true
 
 objects = {}
 
--- menu arrow
-arrow = {
+----------------
+-- title screen!
+----------------
+function _init()
+ arrow = {
   x = 20,
   y = 30
-}
-
-function _init()
--- creates array from map
- levels = create_level_array()
-
---[[ clear whole map
-for x=0,127 do
- for y=0,63 do
-  mset(x,y,0)
- end
-end
---]]
-
- if export_levels == true then
-  printh("level 1", "level1.txt", true)
-  printh("level 2", "level2.txt", true)
-  printh("level 3", "level3.txt", true)
-  printh("level 4", "level4.txt", true)
-
-  for l=1,4 do
-   for x=1,128 do
-    for y=1,16 do
-     printh("cell "..(x-1)..","..(y-1).."="..levels[l][x][y], "level"..l..".txt")
-    end
-   end
-  end
- end
-
- dbg = ""
-
- is_titlescreen = true
-
- if is_titlescreen == false then
-  game_init()
- end
+ }
 end
 
-function game_init()
- t=0
-
- create_map(currentlevel)
-
--- scans map for nico's sprite
- for y=0,15 do
-  for x=0,127 do
-   if (mget(x,y) == 1) then
-    nico = make_nico(x,y)
-    mset(x,y,0)
-   end
-  end
- end
-
- for y=0,15 do
-  for x=0,127 do
-   if (fget(mget(x,y), 1) == true) then
-    add(objects,create_object(x,y,mget(x,y)))
-    mset(x,y,0)
-   end
-  end
- end
-
- game_cam = make_cam(nico)
-end
-
-function titlescreen()
+function _draw()
  cls()
-
  print(">", arrow.x, arrow.y, 12)
 
  print("nico-8",0,0,13)
@@ -94,12 +35,11 @@ function titlescreen()
  print("level 3", 30, 46, 13)
  print("level 4", 30, 54, 13)
  print("camera drag: "..tostr(camera_drag), 30, 62, 13)
-
- menu_input()
 end
 
-function menu_input()
-
+-- sets the update function to a title screen
+function _update()
+ dbg = ""
  if (btn(2) and btn(3)) then
   return
  end
@@ -135,31 +75,120 @@ function menu_input()
   if arrow.y == 46 then currentlevel = 2 end
   if arrow.y == 54 then currentlevel = 3 end
 
-  is_titlescreen = false
-
   game_init()
  end
-
 end
 
--- creates nico based on x and y which should be found using mget
+-- when the game starts
+function game_init()
+ t=0
+
+ _update = game_update
+ _draw = game_draw
+
+ -- creates an array of the levels
+ levels = {}
+
+ for l=0,3 do
+  levels[l+1] = {}
+  for x=0,127 do
+   levels[l+1][x+1] = {}
+   for y=0,15 do
+    levels[l+1][x+1][y+1] = mget(x,y+(16*l))
+   end
+  end
+ end
+
+ -- sets the play area for level 1 to a level offset stored in array
+ for x=0,127 do
+   for y=0,15 do
+    mset(x,y,levels[currentlevel+1][x+1][y+1])
+  end
+ end
+
+ -- scans map for nico's sprite
+ map_filter(function(x,y) return mget(x,y) == 1 end, function (x,y)
+  nico = make_nico(x,y)
+  add(objects, nico)
+  mset(x,y,0)
+ end)
+
+ -- load the solid parts of the map
+ map_filter(function(x, y) return fget(mget(x,y), 1) end, function (x, y)
+  add(objects, create_object(x, y, mget(x, y)))
+  mset(x, y, 0)
+ end)
+
+ -- loads the camera
+ game_cam = make_cam(nico)
+end
+
+-->8
+-- constructors + actors
+
+-- camera constructor
+function make_cam(target)
+ return {
+  tar = target,
+
+  cam_y = 0,
+  cam_x = 0,
+
+  min_x = 0,
+  max_x = 128*8,
+
+  update=function(self)
+   self.cam_x = self.tar.x - 60
+
+   if(self.cam_x < self.min_x) then
+    self.cam_x = self.min_x
+   end
+   if(self.cam_x + 128 > self.max_x) then
+    self.cam_x = self.max_x - 128
+   end
+  end,
+
+  value=function(self)
+   return self.cam_x, self.cam_y
+  end,
+
+  return_x=function(self)
+   return self.cam_x
+  end,
+
+  return_y=function(self)
+   return self.cam_y
+  end
+ }
+end
+
+-- object constructor
+function create_object(x, y, sprite)
+ return {
+  x = x * 8,
+  y = y * 8,
+  s = sprite,
+
+  update=function(self)
+   if t%8 == 0 then
+    self.y = self.y + 1
+   elseif t%4 == 0 then
+    self.y = self.y - 1
+   end
+  end
+ }
+end
+
+-- nico constructor
+-- creates nico based on x and y (which should be found using mget)
 function make_nico(x,y)
- local n = { -- nico-nii
+ return { -- nico-nii
   x = x * 8, -- convert tile value to pixel value
   y = y * 8, -- convert tile value to pixel value
   vx = 0,
   vy = 0,
   s = 1,
   l = false, -- left?
-
-  reset=function(this)
-   this.x = 0
-   this.y = 0
-   this.vx = 0
-   this.vy = 0
-   this.s = 1
-   this.l = false
-  end,
 
   -- slow down nico
   brake=function(this)
@@ -224,13 +253,12 @@ function make_nico(x,y)
   end,
 
   update=function(this)
-
    -- if nico nico nii♥ is playing, prevent other input
    if stat(16) != 1 then
     this.handle_input(this)
    else
     this.s = 4
-   end 
+   end
 
    this.brake(this)
 
@@ -275,127 +303,32 @@ function make_nico(x,y)
 
    this.x = this.x + this.vx
    this.y = this.y + this.vy
-  end
- }
-
- return n
-end
-
-function create_object(x, y, sprite)
- local obj = {
-  x = x * 8,
-  y = y * 8,
-  s = sprite,
-
-  update=function(self)
-   if t%8 == 0 then
-    self.y = self.y + 1
-   elseif t%4 == 0 then
-    self.y = self.y - 1
-   end
   end,
 
+  pre_draw=function()
+   palt(11,true)
+   palt(0,false)
+  end,
+
+  post_draw=function()
+   palt(0,true)
+   palt(11,false)
+  end
  }
-
- return obj
 end
 
--- creates an array of the levels
-function create_level_array()
- local levels = {}
-
- for l=0,3 do
-  levels[l+1] = {}
-  for x=0,127 do
-   levels[l+1][x+1] = {}
-    for y=0,15 do
-     levels[l+1][x+1][y+1] = mget(x,y+(16*l))
-   end
-  end
- end
-
- return levels
-end
-
--- sets the play area for level 1 to levels stored in array
-function create_map(level_offset)
- for x=0,127 do
-   for y=0,15 do
-    mset(x,y,levels[level_offset+1][x+1][y+1])
-  end
- end
-end
-
--- call me with all of your debug messages!
-function debug(msg)
- if dbg != "" then
-  dbg = dbg.."\n"
- end
-
- dbg = dbg..tostr(msg)
-end
 -->8
--- update + related
-
-function _update()
- if is_titlescreen == true then
-  titlescreen()
- else
-  game_update()
- end
-end
-
+-- game update + related
 function game_update()
- t=t+1
  dbg = ""
+ t=t+1
 
  if t == 32766 then t = 0 end -- lolololololol
-
  if camera_drag == true then game_cam:update() end
 
  foreach(objects,function(obj) obj:update() end)
 
- nico:update()
-
  if camera_drag == false then game_cam:update() end
-end
-
-function make_cam(target)
- local cam =
- {
-  tar = target,
-
-  cam_y = 0,
-  cam_x = 0,
-
-  min_x = 0,
-  max_x = 128*8,
-
-  update=function(self)
-   self.cam_x = self.tar.x - 60
-
-   if(self.cam_x < self.min_x) then
-    self.cam_x = self.min_x
-   end
-   if(self.cam_x + 128 > self.max_x) then
-    self.cam_x = self.max_x - 128
-   end
-  end,
-
-  value=function(self)
-   return self.cam_x, self.cam_y
-  end,
-
-  return_x=function(self)
-   return self.cam_x
-  end,
-
-  return_y=function(self)
-   return self.cam_y
-  end
- }
-
- return cam
 end
 
 -- check for wall
@@ -420,23 +353,12 @@ function is_ground(x, y)
   or is_blocking(x + 7, y)
 end
 -->8
--- draw + related
-
-function _draw()
- if is_titlescreen == false then
-  game_draw()
- end
-end
+-- game draw + related
 
 function game_draw()
  cls()
 
  camera(game_cam:value())
-
--- debug some value here
--- if nico.vy >= 15 then
---  print("waahhhhh!!",0+cam_x,0,7)
--- end
 
  -- cooridinate debugging, includes x and y values for nico, camera, and map tiles
  debug("nico.x="..nico.x..", nico.y="..nico.y)
@@ -447,8 +369,6 @@ function game_draw()
 
  draw_level_background()
 
- palt(0,true)
- palt(11,false)
  map(0,0, 0,0, 128,16)
 
  if nico.s == 4 then
@@ -466,21 +386,24 @@ function game_draw()
   end
  end
 
- foreach(objects,drawsprite)
- palt(11,true)
- palt(0,false)
+ -- sprite drawing and dispatching
+ foreach(objects, function(s)
+  if s.pre_draw then
+   s.pre_draw()
+  end
 
- drawsprite(nico)
+  spr(s.s, s.x, s.y, 1, 1, s.l)
+
+  if s.post_draw then
+   s.post_draw()
+  end
+ end)
 
  nico.l = left
 
  camera()
 
  print(dbg,0,0,7)
-end
-
-function drawsprite(s) -- this is cool
- spr(s.s, s.x, s.y, 1, 1, s.l)
 end
 
 function draw_level_background()
@@ -492,6 +415,30 @@ function draw_level_background()
   rectfill(0,0,248,118,3)
  elseif currentlevel == 3 then
   rectfill(0,0,248,118,6)
+ end
+end
+
+-->8
+-- util + abstractions
+
+-- call me with all of your debug messages!
+function debug(msg)
+ if dbg != "" then
+  dbg = dbg.."\n"
+ end
+
+ dbg = dbg..tostr(msg)
+end
+
+-- accepts two functions, it scans the entire map, and if
+-- `check(x, y)` succeeds, `callback(x, y)` is called
+function map_filter(check, callback)
+ for y=0,15 do
+  for x=0,127 do
+   if check(x, y) then
+    callback(x, y)
+   end
+  end
  end
 end
 
