@@ -163,8 +163,8 @@ function make_nico(x,y)
 
   -- slow down nico
   brake=function(this)
-   if this.vx > 0 then this.vx = this.vx - 1 end
-   if this.vx < 0 then this.vx = this.vx + 1 end
+   if this.vx > 0 then this.vx = this.vx - 1
+   elseif this.vx < 0 then this.vx = this.vx + 1 end
   end,
 
   handle_input=function(this)
