@@ -12,6 +12,7 @@ nico nico nii♥
 camera_drag = true
 
 objects = {}
+bkgd= {13, 12, 3, 6}
 
 function _init()
  -- Set title screen functions as intial game loop
@@ -417,15 +418,7 @@ function game_draw()
 end
 
 function draw_level_background()
- if currentlevel == 0 then
-  rectfill(0,0,2480,118,13)
- elseif currentlevel == 1 then
-  rectfill(0,0,248,118,12)
- elseif currentlevel == 2 then
-  rectfill(0,0,248,118,3)
- elseif currentlevel == 3 then
-  rectfill(0,0,248,118,6)
- end
+  rectfill(0,0,2480,118,bkgd[currentlevel+1])
 end
 
 -->8
