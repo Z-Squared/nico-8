@@ -14,17 +14,24 @@ camera_drag = true
 
 objects = {}
 
+function _init()
+ -- Set title screen functions as intial game loop
+ _draw = title_draw
+ _update = title_update
+ title_init()
+end
+
 ----------------
 -- title screen!
 ----------------
-function _init()
+function title_init()
  arrow = {
   x = 20,
   y = 30
  }
 end
 
-function _draw()
+function title_draw()
  cls()
  print(">", arrow.x, arrow.y, 12)
 
@@ -38,7 +45,7 @@ function _draw()
 end
 
 -- sets the update function to a title screen
-function _update()
+function title_update()
  dbg = ""
  if (btn(2) and btn(3)) then
   return
