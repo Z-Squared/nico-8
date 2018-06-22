@@ -306,6 +306,21 @@ function make_nico(x,y)
   end,
 
   pre_draw=function()
+   if nico.s == 4 then
+    nico.l = false
+    if t%16 > 8 then
+     print("nico nico nii♥",nico.x-20,nico.y-8,14)
+    end
+   end
+
+   if nico.jumping and not on_ground() then
+    if nico.vy > 0 then
+     nico.s = 6
+    else
+     nico.s = 5
+    end
+   end
+
    palt(11,true)
    palt(0,false)
   end,
@@ -370,21 +385,6 @@ function game_draw()
  draw_level_background()
 
  map(0,0, 0,0, 128,16)
-
- if nico.s == 4 then
-  nico.l = false
-  if t%16 > 8 then
-   print("nico nico nii♥",nico.x-20,nico.y-8,14)
-  end
- end
-
- if nico.jumping and not on_ground() then
-  if nico.vy > 0 then
-   nico.s = 6
-  else
-   nico.s = 5
-  end
- end
 
  -- sprite drawing and dispatching
  foreach(objects, function(s)
