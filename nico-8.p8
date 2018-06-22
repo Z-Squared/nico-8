@@ -202,7 +202,7 @@ function make_nico(x,y)
   l = false, -- left?
 
   -- slow down nico
-  brake=function(this)
+  slow_down=function(this)
    if this.vx > 0 then this.vx = this.vx - 1
    elseif this.vx < 0 then this.vx = this.vx + 1 end
   end,
@@ -217,7 +217,7 @@ function make_nico(x,y)
       sfx(1, 0)
      end
     else
-     this.brake(this)
+     this.slow_down(this)
     end
 
     return
@@ -271,7 +271,7 @@ function make_nico(x,y)
     this.s = 4
    end
 
-   this.brake(this)
+   this.slow_down(this)
 
    if this.vx > 5 then this.vx = 5 end
    if this.vx < -5 then this.vx = -5 end
