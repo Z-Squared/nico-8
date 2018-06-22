@@ -113,16 +113,20 @@ function game_init()
  end
 
  -- scans map for nico's sprite
- map_filter(function(x,y) return mget(x,y) == 1 end, function (x,y)
-  nico = make_nico(x,y)
-  add(objects, nico)
-  mset(x,y,0)
+ map_each(function(x,y)
+  if mget(x,y) == 1 then
+   nico = make_nico(x,y)
+   add(objects, nico)
+   mset(x,y,0)
+  end
  end)
 
  -- load the solid parts of the map
- map_filter(function(x, y) return fget(mget(x,y), 1) end, function (x, y)
-  add(objects, create_object(x, y, mget(x, y)))
-  mset(x, y, 0)
+ map_each(function(x, y)
+  if fget(mget(x,y), 1) then
+   add(objects, create_object(x, y, mget(x, y)))
+   mset(x, y, 0)
+  end
  end)
 
  -- loads the camera
@@ -436,14 +440,12 @@ function debug(msg)
  dbg = dbg..tostr(msg)
 end
 
--- accepts two functions, it scans the entire map, and if
--- `check(x, y)` succeeds, `callback(x, y)` is called
-function map_filter(check, callback)
+-- accepts a functions, that will be called with every x and y
+-- coordinate in the map
+function map_each(callback)
  for y=0,15 do
   for x=0,127 do
-   if check(x, y) then
-    callback(x, y)
-   end
+   callback(x, y)
   end
  end
 end
