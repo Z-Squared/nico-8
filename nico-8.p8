@@ -15,7 +15,7 @@ objects = {}
 bkgd= {13, 12, 3, 6}
 
 function _init()
- -- Set title screen functions as intial game loop
+ -- set title screen functions as intial game loop
  _draw = title_draw
  _update = title_update
  title_init()
