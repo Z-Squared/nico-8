@@ -209,6 +209,7 @@ function make_nico(x,y)
   vy = 0,
   s = 1,
   l = false, -- left?
+  hitbox = {x = 0, y = 1, w = 7, h = 7},
 
   -- slow down nico
   slow_down=function(this)
