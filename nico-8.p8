@@ -189,6 +189,18 @@ function create_object(x, y, sprite)
   y = y * 8,
   s = sprite,
 
+  obj_type = ({
+   [49] = "disc",
+   [50] = "bottle",
+   [54] = "orb"
+   })[sprite],
+
+  hitbox = ({
+   [49] = {x = 1, y = 2, w = 5, h = 5},
+   [50] = {x = 2, y = 1, w = 3, h = 6},
+   [54] = {x = 1, y = 1, w = 6, h = 6}
+   })[sprite],
+
   update=function(self)
    if t%8 == 0 then
     self.y = self.y + 1
