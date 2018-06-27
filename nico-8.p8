@@ -14,6 +14,8 @@ camera_drag = true
 objects = {}
 bkgd= {13, 12, 3, 6}
 
+score = 0
+
 function _init()
  -- set title screen functions as intial game loop
  _draw = title_draw
@@ -202,11 +204,18 @@ function create_object(x, y, sprite)
    })[sprite],
 
   update=function(self)
+   if nico.x == self.x and nico.y == self.y then self.pickup(self) end
+
    if t%8 == 0 then
     self.y = self.y + 1
    elseif t%4 == 0 then
     self.y = self.y - 1
    end
+  end,
+
+  pickup=function(self)
+   add_score(self.obj_type)
+   del(objects,self)
   end
  }
 end
@@ -428,6 +437,15 @@ function is_ground(x, y)
  return is_blocking(x + 1, y)
   or is_blocking(x + 7, y)
 end
+
+function add_score(obj_type)
+ score = score + ({
+   disc = 300,
+   bottle = 3000,
+   orb = 1000
+  })[obj_type]
+end
+
 -->8
 -- game draw + related
 
@@ -440,6 +458,7 @@ function game_draw()
  debug("nico.x="..nico.x..", nico.y="..nico.y)
  debug("cam_x="..game_cam:return_x()..", cam_y="..game_cam:return_y())
  debug("tilex="..flr(nico.x / 8)..", tiley="..flr(nico.y / 8)..", solid: "..tostr(is_wall(nico.x,nico.y)))
+ debug("score: "..score)
 
  local left = nico.l
 
