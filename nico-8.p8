@@ -204,8 +204,6 @@ function create_object(x, y, sprite)
    })[sprite],
 
   update=function(self)
-   if nico.x == self.x and nico.y == self.y then self.pickup(self) end
-
    if t%8 == 0 then
     self.y = self.y + 1
    elseif t%4 == 0 then
@@ -213,7 +211,7 @@ function create_object(x, y, sprite)
    end
   end,
 
-  pickup=function(self)
+  touch=function(self)
    add_score(self.obj_type)
    del(objects,self)
   end
@@ -295,6 +293,14 @@ function make_nico(x,y)
   end,
 
   update=function(this)
+   foreach(objects, function(obj)
+    if(obj.touch) then
+     if(is_touching(this, obj)) then
+       obj:touch()
+     end
+    end
+   end)
+   
    -- if nico nico nii♥ is playing, prevent other input
    if stat(16) != 1 then
     this.handle_input(this)
