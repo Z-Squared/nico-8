@@ -438,6 +438,13 @@ function is_ground(x, y)
   or is_blocking(x + 7, y)
 end
 
+function is_touching(actor1, actor2)
+ return actor1.x+actor1.hitbox.x+actor1.hitbox.w > actor2.x+actor2.hitbox.x and 
+    actor1.y+actor1.hitbox.y+actor1.hitbox.h > actor2.y+actor2.hitbox.y and
+    actor1.x+actor1.hitbox.x < actor2.x+actor2.hitbox.x+actor2.hitbox.w and 
+    actor1.y+actor1.hitbox.y < actor2.y+actor2.hitbox.y+actor2.hitbox.h
+end
+
 function add_score(obj_type)
  score = score + ({
    disc = 300,
