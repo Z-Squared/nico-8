@@ -198,7 +198,7 @@ function create_object(x, y, sprite)
    })[sprite],
 
   hitbox = ({
-   [49] = {x = 1, y = 2, w = 5, h = 5},
+   [49] = {x = 1, y = 2, w = 4, h = 4},
    [50] = {x = 2, y = 1, w = 3, h = 6},
    [54] = {x = 1, y = 1, w = 6, h = 6}
    })[sprite],
@@ -228,7 +228,9 @@ function make_nico(x,y)
   vy = 0,
   s = 1,
   l = false, -- left?
-  hitbox = {x = 0, y = 1, w = 7, h = 7},
+  hitbox = {x = 0, y = 1, w = 6, h = 6}, -- initial hitbox
+  hitbox_r = {x = 0, y = 1, w = 6, h = 6},
+  hitbox_l = {x = 1, y = 1, w = 6, h = 6},
 
   -- slow down nico
   slow_down=function(this)
@@ -293,6 +295,12 @@ function make_nico(x,y)
   end,
 
   update=function(this)
+   if this.l then
+    this.hitbox = this.hitbox_l
+   else
+    this.hitbox = this.hitbox_r
+   end
+
    foreach(objects, function(obj)
     if(obj.touch) then
      if(is_touching(this, obj)) then
@@ -445,10 +453,10 @@ function is_ground(x, y)
 end
 
 function is_touching(actor1, actor2)
- return actor1.x+actor1.hitbox.x+actor1.hitbox.w > actor2.x+actor2.hitbox.x and 
-    actor1.y+actor1.hitbox.y+actor1.hitbox.h > actor2.y+actor2.hitbox.y and
-    actor1.x+actor1.hitbox.x < actor2.x+actor2.hitbox.x+actor2.hitbox.w and 
-    actor1.y+actor1.hitbox.y < actor2.y+actor2.hitbox.y+actor2.hitbox.h
+ return actor1.x+actor1.hitbox.x+actor1.hitbox.w >= actor2.x+actor2.hitbox.x and
+  actor1.y+actor1.hitbox.y+actor1.hitbox.h >= actor2.y+actor2.hitbox.y and
+  actor1.x+actor1.hitbox.x <= actor2.x+actor2.hitbox.x+actor2.hitbox.w and
+  actor1.y+actor1.hitbox.y <= actor2.y+actor2.hitbox.y+actor2.hitbox.h
 end
 
 function add_score(obj_type)
