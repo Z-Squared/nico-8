@@ -79,10 +79,10 @@ function title_update()
     return
   end
 
-  if arrow.y == 30 then currentlevel = 0 end
-  if arrow.y == 38 then currentlevel = 1 end
-  if arrow.y == 46 then currentlevel = 2 end
-  if arrow.y == 54 then currentlevel = 3 end
+  if arrow.y == 30 then currentlevel = 1 end
+  if arrow.y == 38 then currentlevel = 2 end
+  if arrow.y == 46 then currentlevel = 3 end
+  if arrow.y == 54 then currentlevel = 4 end
 
   game_init()
  end
@@ -111,7 +111,7 @@ function game_init()
  -- sets the play area for level 1 to a level offset stored in array
  for x=0,127 do
    for y=0,15 do
-    mset(x,y,levels[currentlevel+1][x+1][y+1])
+    mset(x,y,levels[currentlevel][x+1][y+1])
   end
  end
 
@@ -500,7 +500,7 @@ function game_draw()
 end
 
 function draw_level_background()
-  rectfill(0,0,2480,118,bkgd[currentlevel+1])
+  rectfill(0,0,2480,118,bkgd[currentlevel])
 end
 
 -->8
