@@ -302,10 +302,8 @@ function make_nico(x,y)
    end
 
    foreach(objects, function(obj)
-    if(obj.touch) then
-     if(is_touching(this, obj)) then
-       obj:touch()
-     end
+    if(obj.touch and is_touching(this, obj)) then
+     obj:touch()
     end
    end)
    
